@@ -1,0 +1,5 @@
+build/*
+*sublime*
+*sublime-workspace
+runOutput/
+output/*
