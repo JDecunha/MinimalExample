@@ -21,7 +21,7 @@ void StraightLineParameterisation::ComputeDimensions(G4Box& box, const G4int cop
 {
     box.SetXHalfLength(_halfx);
     box.SetYHalfLength(_halfy);
-    box.SetZHalfLength((_halfz/_zinc)*0.95); //Introduce the "fudge factor" to give a little spacing between boxes
+    box.SetZHalfLength(_halfz/_zinc); 
 }
 
 void StraightLineParameterisation::ComputeTransformation(const G4int copyNo, G4VPhysicalVolume* physical) const
