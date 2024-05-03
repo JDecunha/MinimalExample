@@ -34,8 +34,14 @@ void ParallelWorldConstruction::Construct()
   G4double yHalfSize = 2*cm;
   G4double zHalfSize = pRunAction->GetScoringHalfLength();
 
+  //
+  // Normal scoring box
+  //
+
   G4Box* scoringBox = new G4Box("scoringBox", xHalfSize, yHalfSize, zHalfSize);
   G4LogicalVolume * scoringBox_logical = new G4LogicalVolume(scoringBox, 0, "scoringBox_logical", 0, 0, 0);
+  G4ThreeVector phantomOffset = G4ThreeVector(0, 0, ((-5*cm)));
+  G4VPhysicalVolume* scoringBox_physical = new G4PVPlacement(0, phantomOffset, scoringBox_logical, "scoringBox_logical", motherWorldLogical, false, 0, false);
 
   //Visualize scoring box
   G4VisAttributes* scoring_vis = new G4VisAttributes();
@@ -49,8 +55,14 @@ void ParallelWorldConstruction::Construct()
   G4int xIncrements = 1; G4int yIncrements = 1;
   G4int numVoxels = xIncrements*yIncrements*zIncrements;
 
-  StraightLineParameterisation* lineParam = new StraightLineParameterisation(xHalfSize,yHalfSize,zHalfSize,zIncrements);
-  G4PVParameterised* phantomVoxels = new G4PVParameterised("voxelsAlongLine", scoringBox_logical, motherWorldLogical, kZAxis, numVoxels, lineParam);
+  G4Box* ScoringZCuts = new G4Box("ScoringZCuts", 1*cm, 1*cm, (zAxisResolution/2.));
+  G4LogicalVolume* ScoringZCuts_log = new G4LogicalVolume(ScoringZCuts, 0,"ScoringZCutsLog");
+  G4VPhysicalVolume* ScoringZCuts_physical = new G4PVReplica("ScoringZCutsPhysical",
+                                                              ScoringZCuts_log,
+                                                              scoringBox_physical,
+                                                              kZAxis,
+                                                              zIncrements,
+                                                              zAxisResolution);
 
 }
 
@@ -70,5 +82,5 @@ void ParallelWorldConstruction::ConstructSD()
 
   //Register sensitive detector with SDManager, and register SD with logical volume
   SDManager->AddNewDetector(MultiFuncDetector);
-  SetSensitiveDetector("scoringBox_logical",MultiFuncDetector);
+  SetSensitiveDetector("ScoringZCutsLog",MultiFuncDetector);
 }
